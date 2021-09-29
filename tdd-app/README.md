@@ -48,3 +48,58 @@ npm install jest node-mocks-http supertest --save-dev
     이런 프로그램을 개발하는 개발자들은 유닛테스트를 만들어서 빠르게
     자신의 코드가 정상적으로 동작하는지 확인할 수 있다.
 2.  종속성이 있는 다른 클래스들에서 버그가 나는 것을 방지한다.
+
+---
+
+### Create - default
+
+#### Work Flow
+
+1.  TODO
+2.  Unit Test Script
+3.  Test Driven Development
+
+#### 1. TODO
+
+먼저 할 일은 DB에 Product를 저장하는 것입니다.
+그 중에서 Product를 저장하기 위한 함수를 먼저 생성합니다.
+
+#### 2. Unit Test Script
+
+```bash
+test/unit/product.test.js
+```
+
+```js
+describe("Product Controller Create", () => {
+  it("should have a createProduct function", () => {
+    expect(typeof productController.createProduct).toBe("function");
+  });
+});
+```
+
+#### 3. Test Driven Development
+
+```bash
+controller/product.js
+```
+
+```js
+exports.createProduct = () => {};
+```
+
+### Create - Method
+
+#### 1. TODO
+
+`createProduct` 함수를 호출할 때
+`Product Model`의 `Create` 메소드가 호출되는지 확인한다.
+
+#### 2. Unit Test
+
+```js
+it("should call Product.create", () => {
+  productController.createProduct();
+  expect(productModel.create).toBeCalledWith();
+});
+```
