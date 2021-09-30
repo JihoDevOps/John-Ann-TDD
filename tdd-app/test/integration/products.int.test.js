@@ -1,7 +1,9 @@
 const request = require("supertest");
+const Product = require("../../models/Product");
 const app = require("../../server");
 
 const newProduct = require("../data/new-product.json");
+let firstProduct;
 
 test("POST /api/products", async () => {
   const response = await request(app)
@@ -20,4 +22,58 @@ test("should return 500 on POST /api/products", async () => {
   expect(response.body).toStrictEqual({
     message: "Product validation failed: description: Path `description` is required."
   });
+});
+
+test("GET /api/products", async () => {
+  const response = await request(app).get("/api/products");
+  expect(response.statusCode).toBe(200);
+  expect(Array.isArray(response.body)).toBeTruthy();
+  for (product of response.body) {
+    expect(product.name).toBeDefined();
+    expect(product.description).toBeDefined();
+  }
+  // 다른 통합 테스트를 위해 ID 하나 뽑아두기
+  firstProduct = response.body[0];
+});
+
+test("GET /api/products/:productId", async () => {
+  const response = await request(app).get(`/api/products/${firstProduct._id}`);
+  expect(response.statusCode).toBe(200);
+  expect(response.body.name).toBe(firstProduct.name);
+  expect(response.body.description).toBe(firstProduct.description);
+});
+
+test("GET id doesn't exist /api/products/:productId", async () => {
+  const response = await request(app).get(`/api/products/6154101c39a8ac6cfa27a884`);
+  expect(response.statusCode).toBe(404);
+});
+
+test("PUT /api/products/:productId", async () => {
+  const response = await request(app)
+      .put(`/api/products/${firstProduct._id}`)
+      .send({ name: "updated name", description: "updated description" });
+  expect(response.statusCode).toBe(200);
+  expect(response.body.name).toBe("updated name");
+  expect(response.body.description).toBe("updated description");
+});
+
+test("should return 404 on PUT /api/products/:productId", async () => {
+  const response = await request(app)
+      .put(`/api/products/6154101c39a8ac6cfa27a884`)
+      .send({ name: "updated name", description: "updated description" });
+  expect(response.statusCode).toBe(404);
+});
+
+test("DELETE /api/products/:productId", async () => {
+  const response = await request(app)
+      .delete(`/api/products/${firstProduct._id}`)
+      .send();
+  expect(response.statusCode).toBe(200);
+});
+
+test("DELETE id doesn't exist /api/products/:productId", async () => {
+  const response = await request(app)
+      .delete(`/api/products/6154101c39a8ac6cfa27a884`)
+      .send();
+  expect(response.statusCode).toBe(404);
 });
